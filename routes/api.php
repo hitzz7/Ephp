@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 // use App\Http\Controllers\CategoryController;
 // use App\Http\Controllers\ProductController;
 // use App\Http\Controllers\ImageController;
@@ -26,7 +27,8 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/categoryes/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
 // Route::patch('/categoryes/{category}', [CategoryController::class, 'update'])->name('categories.update');
 // Route::delete('/categoryes/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-
+Route::get('/products/{id}/items', [ProductController::class, 'getProductItems']);
+Route::get('/products/by-sku', [ProductController::class, 'getProductBySKU']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

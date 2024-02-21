@@ -14,6 +14,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Http;
 class ProductController extends Controller
 {
     /**
@@ -112,6 +113,28 @@ class ProductController extends Controller
         
         return view('products.show', compact('product'));
     }
+    public function getProductItems(Request $request, $id)
+    {
+        $productItems = Item::where('product_id', $id)->select('sku', 'inventory', 'status')->get();
+
+        return response()->json($productItems);
+    }
+    public function getProductBySKU(Request $request)
+    {
+        $sku = $request->input('sku');
+
+        // Find the item by SKU
+        $item = Item::select("id","product_id","status","inventory")->where('sku', $sku)->with('product:id,name')->first();
+
+        if (!$item) {
+            $item = (object) [
+                'status' => 0,
+                'inventory' => 0
+            ];
+        }
+
+        return response()->json($item);
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -123,13 +146,27 @@ class ProductController extends Controller
         $categories = Category::all();
         $sizes = Size::all();
         $colors = Color::all();
-        
 
         // Load all items, images, and prices associated with the product
-        $items = $product->items()->with( 'prices')->get();
+        $items = $product->items()->with('prices')->get();
         $images = $product->with('images')->get();
 
-        return view('products.edit', compact('product', 'categories', 'items','images','sizes','colors'));
+        // Fetch status and inventory from the API
+        $response = Http::withOptions(['verify' => false])->get('https://voxshipsapi.shikhartech.com/inventoryItems/' . $product->sku);
+            
+        if ($response->successful()) {
+            $inventoryData = $response->json();
+
+            // Pass the inventory data to the view
+            return view('products.edit', compact('product', 'categories', 'items', 'images', 'sizes', 'colors', 'inventoryData'));
+        } else {
+            // Handle error when the API request fails
+            // For example, you can set default values for status and inventory
+            $inventoryData = ['status' => 0, 'inventory' => 0];
+
+            // Pass the inventory data to the view
+            return view('products.edit', compact('product', 'categories', 'items', 'images', 'sizes', 'colors', 'inventoryData'));
+        }
     }
 
     /**
