@@ -44,7 +44,7 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreProductRequest $request)
-    {
+    {   
         $productData = $request->only(['name', 'description', 'sku', 'status']);
         $productData['user_id'] = auth()->id(); // Assuming you're using authentication
 
@@ -136,7 +136,8 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      */
     public function update(UpdateProductRequest $request, Product $product)
-    {
+    {   
+        //dd($request->all());
         $productData = $request->only(['name', 'description',  'status']);
         $product->update($productData);
 
@@ -146,7 +147,7 @@ class ProductController extends Controller
         // Remove existing items not present in the request
         $product->items()->whereNotIn('id', collect($request->input('items'))->pluck('id'))->delete();
 
-        $itemsData = $request->input('items');
+         $itemsData = $request->input('items');
         foreach ($itemsData as $itemData) {
             $item = Item::updateOrCreate(
                 ['id' => $itemData['id']], // Assuming 'id' is included in the request for each item
@@ -159,6 +160,7 @@ class ProductController extends Controller
                     'weight' => $itemData['weight'],
                 ]
             );
+            //dd($item);
 
             if (isset($itemData['prices']) && is_array($itemData['prices'])) {
                 foreach ($itemData['prices'] as $priceData) {
@@ -176,11 +178,11 @@ class ProductController extends Controller
 
             // You can perform other operations such as updating prices, images, etc. here if needed
         }
-        $imagesData = $request->file('images');
-        foreach ($imagesData as $image) {
-            $path = $image->store('images', 'public');
-            $product->images()->create(['image' => $path]);
-    }
+        // $imagesData = $request->file('images');
+        // foreach ($imagesData as $image) {
+        //     $path = $image->store('images', 'public');
+        //     $product->images()->create(['image' => $path]);
+        // }
 
         // Redirect back to the product index page or any other appropriate route
         return redirect()->route('products.index');

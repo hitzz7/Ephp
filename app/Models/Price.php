@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 class Price extends Model
 {
     use HasFactory;
-    protected $fillable = ['price','quantity','weight','status'];
+    protected $fillable = ['price','quantity','weight','status','item_id'];
     public function items()
     {
         return $this->belongsTo(Product::class);

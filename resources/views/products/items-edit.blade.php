@@ -88,45 +88,100 @@
 
     <!-- Add a button to dynamically add more items -->
     <button type="button" class="btn btn-primary mt-3 add-item">Add Item</button>
+    
 </div>
-
-<!-- Include JavaScript to handle dynamically adding items and prices -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add event listener for adding prices
-        document.querySelectorAll('.add-price').forEach(function(button) {
-            button.addEventListener('click', function() {
-                // Find the container for this item's prices
-                var priceContainer = this.closest('.item').querySelector('.price-container');
-                
-                // Create a new row for the price
-                var newRow = document.createElement('div');
-                newRow.classList.add('row', 'price-row');
-                newRow.innerHTML = `
-                    <!-- Price details -->
+document.addEventListener('DOMContentLoaded', function() {
+    const addItemButton = document.querySelector('.add-item');
+    const itemContainer = document.querySelector('.item-container');
+    let itemIndex = {{$product->items->count() }};
+    
+    
+    addItemButton.addEventListener('click', function() {
+        itemIndex++; // Increment item index counter
+
+        const newItem = document.createElement('div');
+        newItem.classList.add('item');
+        
+        newItem.innerHTML = `
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="sku">SKU:</label>
+                        <input type="hidden" name="items[${itemIndex}][id]" class="form-control" value="">
+                        <input type="text" name="items[${itemIndex}][sku]" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="inventory">Inventory:</label>
+                        <input type="hidden" name="items[${itemIndex}][id]" class="form-control" value="">
+                        <input type="text" name="items[${itemIndex}][inventory]" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="weight">Weight:</label>
+                        <input type="hidden" name="items[${itemIndex}][id]" class="form-control" value="">
+                        <input type="text" name="items[${itemIndex}][weight]" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="size">Size:</label>
+                        <select name="items[${itemIndex}][size_id]" class="form-control" required>
+                            <!-- Include dropdown options for sizes -->
+                            @foreach ($sizes as $size)
+                                <option value="{{ $size->id }}">{{ $size->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="color">Color:</label>
+                        <select name="items[${itemIndex}][color_id]" class="form-control" required>
+                            <!-- Include dropdown options for colors -->
+                            @foreach ($colors as $color)
+                                <option value="{{ $color->id }}">{{ $color->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="price-container">
+                <!-- Price fields for the new item -->
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="price">Price:</label>
-                            <input type="text" name="items[${item->id}][prices][new][price]" class="form-control" required>
+                            <input type="hidden" name="items[${itemIndex}][prices][0][id]">
+                            <input type="text" name="items[${itemIndex}][prices][0][price]" class="form-control" required>
+                            
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="quantity">Quantity:</label>
-                            <input type="text" name="items[${item->id}][prices][new][quantity]" class="form-control">
+                            <input type="text" name="items[${itemIndex}][prices][0][quantity]" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="weight">Weight:</label>
-                            <input type="text" name="items[${item->id}][prices][new][weight]" class="form-control">
+                            <input type="text" name="items[${itemIndex}][prices][0][weight]" class="form-control">
                         </div>
                     </div>
-                `;
-                
-                // Append the new row to the price container
-                priceContainer.appendChild(newRow);
-            });
-        });
+                </div>
+            </div>
+            <button type="button" class="btn btn-info mt-3 add-price">Add Price</button>
+        `;
+        
+        itemContainer.appendChild(newItem);
     });
+});
 </script>
+
+
+
+
