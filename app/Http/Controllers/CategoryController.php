@@ -21,6 +21,22 @@ class CategoryController extends Controller
         return view('categories.index',compact('categories'));
         
     }
+    public function toggleStatus(Category $category)
+    {
+        $category->status = !$category->status;
+        $category->save();
+
+        return back()->with('success', 'Category status updated successfully.');
+    }
+    // CategoryController.php
+    public function showChildren(Category $category)
+    {
+        $children = $category->children; // Assuming you have a 'children' relationship defined in your Category model
+
+        return view('categories.children', compact('children', 'category')); // Pass the child categories and parent category to the view
+    }
+
+
 
     /**
      * Show the form for creating a new resource.

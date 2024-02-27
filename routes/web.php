@@ -8,6 +8,9 @@ use App\Http\Controllers\ProductController;
 
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\SizeController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 
 // Color resource routes
 
@@ -53,15 +56,25 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth','role:admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('colors', ColorController::class);
     Route::resource('sizes', SizeController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('roles', RoleController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
+    Route::get('/categories/{category}/toggleStatus', [CategoryController::class, 'toggleStatus'])->name('categories.toggleStatus');
+    // web.php
+    Route::get('/categories/{category}/children', [CategoryController::class, 'showChildren'])->name('categories.children');
+
+
     
 });
+// Route::group(['middleware' => ['role:admin']], function () {
+//     Route::resource('products', ProductController::class);
+// });
 
 require __DIR__.'/auth.php';
