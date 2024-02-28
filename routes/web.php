@@ -56,7 +56,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware(['auth','role:admin'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -65,7 +65,25 @@ Route::middleware(['auth','role:admin'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('categories', CategoryController::class);
-    Route::resource('products', ProductController::class);
+    Route::get('products', [ProductController::class, 'index'])->name('products.index');
+
+// Create
+    Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+
+    // Store
+    Route::post('products', [ProductController::class, 'store'])->name('products.store');
+
+    // Show
+    Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+    // Edit
+    Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+
+    // Update
+    Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+
+    // Destroy
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::get('/categories/{category}/toggleStatus', [CategoryController::class, 'toggleStatus'])->name('categories.toggleStatus');
     // web.php
     Route::get('/categories/{category}/children', [CategoryController::class, 'showChildren'])->name('categories.children');
@@ -73,6 +91,14 @@ Route::middleware(['auth','role:admin'])->group(function () {
 
     
 });
+
+// For manager roles with specific permissions
+// Route::middleware(['auth', 'role:admin|manager'])->group(function () {
+//     Route::resource('products', ProductController::class);
+//     // Other routes accessible by managers
+// });
+
+
 // Route::group(['middleware' => ['role:admin']], function () {
 //     Route::resource('products', ProductController::class);
 // });

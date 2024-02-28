@@ -24,12 +24,12 @@ class ProductController extends Controller
      * Display a listing of the resource.
      */
 
-     public function __construct()
-    {
-        $this->middleware('role:admin')->except('index', 'show');
-    }
-    public function index()
-    {
+    
+    public function index(Request $request)
+    {   
+        if (!$request->user()->can('list products')) {
+            abort(403, 'Unauthorized');
+        }
         $products = Product::with('items')->with('user')->paginate(100);
         $columnHeaders = Schema::getColumnListing('products'); // Assuming 'products' is your table name
 
@@ -39,8 +39,13 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
+
 {
+    if (!$request->user()->can('create products')) {
+        abort(403, 'Unauthorized');
+    }
+
     $categories = Category::all();
     $sizes = Size::all();
     $colors = Color::all();
@@ -52,8 +57,12 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductRequest $request)
+    public function store(Request $request)
     {   
+        
+
+        
+
         $productData = $request->only(['name', 'description', 'sku', 'status']);
         $productData['user_id'] = auth()->id(); // Assuming you're using authentication
 
@@ -115,8 +124,12 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request,$id)
     {
+        if (!$request->user()->can('show products')) {
+            abort(403, 'Unauthorized');
+        }
+
         $product = Product::where('id',$id)->with(['images','category','items'])->first();
         
         return view('products.show', compact('product'));
@@ -147,8 +160,13 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
-    {
+    public function edit(Request $request,Product $product)
+    {   
+
+        if (!$request->user()->can('edit products')) {
+            abort(403, 'Unauthorized');
+        }
+        
         // Load all categories to display in the select dropdown
         $product->load('category');
         $categories = Category::all();
@@ -210,6 +228,9 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {   
+        
+        
+        
         //dd($request->all());
         $productData = $request->only(['name', 'description',  'status']);
         $product->update($productData);
@@ -266,8 +287,12 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
-    {
+    public function destroy(Request $request,Product $product)
+    {   
+        if (!$request->user()->can('delete products')) {
+            abort(403, 'Unauthorized');
+        }
+        
         $product->delete();
 
         return redirect()->route('products.index');

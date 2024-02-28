@@ -23,11 +23,11 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="role" class="form-label">Role</label>
-                                <select class="form-select" id="role" name="role">
-                                    <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
-                                    <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="manager" {{ $user->role == 'manager' ? 'selected' : '' }}>Manager</option>
+                                <label for="roles" class="form-label">Roles</label>
+                                <select class="form-select" id="roles" name="roles[]" multiple>
+                                    <option value="user" {{ in_array('user', $user->roles->pluck('name')->toArray()) ? 'selected' : '' }}>User</option>
+                                    <option value="admin" {{ in_array('admin', $user->roles->pluck('name')->toArray()) ? 'selected' : '' }}>Admin</option>
+                                    <option value="manager" {{ in_array('manager', $user->roles->pluck('name')->toArray()) ? 'selected' : '' }}>Manager</option>
                                 </select>
                             </div>
 

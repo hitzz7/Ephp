@@ -19,12 +19,19 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', ['user' => $user]);
+        // Load the roles associated with the user
+        $roles = $user->roles()->pluck('name')->toArray();
+
+        // Pass the roles data to the view
+        return view('users.edit', ['user' => $user, 'roles' => $roles]);
     }
 
     public function update(Request $request, User $user)
     {
-        $user->update($request->all());
+        $roles = $request->input('roles', []);
+
+        // Sync the roles for the user
+        $user->syncRoles($roles);
         return back()->with('success', 'User updated successfully');
     }
 }

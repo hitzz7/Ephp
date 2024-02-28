@@ -8,7 +8,9 @@
     </x-slot>
 
     <div class="container mt-5">
+    @if (auth()->user()->can('edit products'))
     <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+    @endif
         @csrf
         @method('PATCH')
         
@@ -62,5 +64,6 @@
 
         <button type="submit" class="btn btn-primary">Update Product</button>
     </form>
+    
     </div>
 </x-app-layout>
