@@ -31,7 +31,9 @@
                                         {{ $role->name }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
+                                        @can('edit roles')
                                         <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary">Edit Permissions</a>
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforeach

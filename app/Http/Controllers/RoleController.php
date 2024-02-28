@@ -10,11 +10,18 @@ class RoleController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->can('list roles')) {
+            abort(403, 'Unauthorized');
+        }
+
         $roles = Role::all();
         return view('roles.index', compact('roles'));
     }
     public function edit($id)
     {
+        if (!auth()->user()->can('edit roles')) {
+            abort(403, 'Unauthorized');
+        }
         $role = Role::findById($id);
         $permissions = Permission::all();
         $rolePermissions = $role->permissions()->pluck('id')->toArray();
@@ -24,6 +31,9 @@ class RoleController extends Controller
 
     public function update(Request $request, $id)
     {  
+        if (!auth()->user()->can('update roles')) {
+            abort(403, 'Unauthorized');
+        }
         // Retrieve the role by ID
         $role = Role::findById($id);
         

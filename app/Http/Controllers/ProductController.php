@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductController extends Controller
 {
@@ -178,47 +180,54 @@ class ProductController extends Controller
         $images = $product->with('images')->get();
         $allSkus = $product->items()->pluck('sku')->toArray();
         $client = new Client();
-        $response = $client->request('POST', 'https://voxshipsapi.shikhartech.com/inventoryItems/A2S', [
-            'headers' => [
-                'apiToken' => '08d3abae99badba40441ca74519c0e11',
-            ],
-            'json' => [
-                "itemSkuNumbers" => $allSkus,
-            ],
-            'verify' => false, // Disable SSL verification
-        ]);
-
-        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
-            $responseData = json_decode($response->getBody(), true);
-
-            // Extract data from the API response
-            $customerItems = $responseData['result']['customerItems'] ?? [];
-            $skuNumbers = array_column($customerItems, 'itemSkuNumber');
-
-            // Update SKU, inventory, and status for each item
-            foreach ($customerItems as $item) {
-                // Find the corresponding item in your database
-                if (isset($item['itemSkuNumber'])) {
+        try {
+            $response = $client->request('POST', env('API_BASE_URL'), [
+                'headers' => [
+                    'apiToken' => env('API_TOKEN'),
+                ],
+                'json' => [
+                    "itemSkuNumbers" => $allSkus,
+                ],
+                'verify' => false, // Disable SSL verification
+            ]);
+        
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+                $responseData = json_decode($response->getBody(), true);
+        
+                // Extract data from the API response
+                $customerItems = $responseData['result']['customerItems'] ?? [];
+                $skuNumbers = array_column($customerItems, 'itemSkuNumber');
+        
+                // Update SKU, inventory, and status for each item
+                foreach ($customerItems as $item) {
                     // Find the corresponding item in your database
-                    $productItem = $product->items()->where('sku', $item['itemSkuNumber'])->first();
-    
-                    // Update SKU, inventory, and status
-                    if ($productItem) {
-                        $productItem->inventory = $item['A2S'] ?? null;
-                        $productItem->status = $item['status'] ?? null;
-                        $productItem->save();
+                    if (isset($item['itemSkuNumber'])) {
+                        // Find the corresponding item in your database
+                        $productItem = $product->items()->where('sku', $item['itemSkuNumber'])->first();
+        
+                        // Update SKU, inventory, and status
+                        if ($productItem) {
+                            $productItem->inventory = $item['A2S'] ?? null;
+                            $productItem->status = $item['status'] ?? null;
+                            $productItem->save();
+                        }
                     }
                 }
-                
+                $product->items()->whereNotIn('sku', $skuNumbers)->update(['inventory' => 0, 'status' => 0]);
+        
+                // Pass the data to the view
+                return view('products.edit', compact('product', 'categories', 'sizes', 'colors', 'images'));
+            } else {
+                // Handle error if API request fails
+                // You can redirect back with an error message or display a generic error view
+                return redirect()->back()->with('error', 'Failed to fetch data from API');
             }
-            $product->items()->whereNotIn('sku',$skuNumbers)->update(['inventory' => 0,'status' => 0]);
-
-            // Pass the data to the view
-            return view('products.edit', compact('product', 'categories', 'sizes', 'colors', 'images'));
-        } else {
-            // Handle error if API request fails
-            // You can redirect back with an error message or display a generic error view
-            return redirect()->back()->with('error', 'Failed to fetch data from API');
+        } catch (RequestException $e) {
+            // Handle GuzzleHttp request exception
+            return redirect()->back()->with('error', 'Failed to communicate with the API: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
 
@@ -228,6 +237,9 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {   
+        if (!$request->user()->can('update products')) {
+            abort(403, 'Unauthorized');
+        }
         
         
         
@@ -287,14 +299,23 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request,Product $product)
+    public function destroy(Request $request, Product $product)
     {   
         if (!$request->user()->can('delete products')) {
             abort(403, 'Unauthorized');
         }
         
-        $product->delete();
+        try {
+            // Soft delete the product
+            $product->delete();
 
-        return redirect()->route('products.index');
+            return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        } catch (ModelNotFoundException $e) {
+            // Handle the case where the product is not found
+            return redirect()->route('products.index')->with('error', 'Product not found.');
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return redirect()->route('products.index')->with('error', 'Failed to delete product.');
+        }
     }
 }

@@ -15,12 +15,16 @@
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     {{ $color->name }}
                     <div>
-                        <a href="{{ route('colors.edit', $color->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        @can('edit colors')
+                            <a href="{{ route('colors.edit', $color->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        @endcan
+                        @can('delete colors')
                         <form action="{{ route('colors.destroy', $color->id) }}" method="POST" class="d-inline-block">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
+                        @endcan
                     </div>
                 </div>
             @empty

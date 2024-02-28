@@ -15,7 +15,10 @@ class CategoryController extends Controller
      * Display a listing of the resource.
      */
     public function index():View
-    {
+    {   
+        if (!auth()->user()->can('list categories')) {
+            abort(403, 'Unauthorized');
+        }
         $categories = Category::all();
 
         return view('categories.index',compact('categories'));
@@ -23,6 +26,7 @@ class CategoryController extends Controller
     }
     public function toggleStatus(Category $category)
     {
+        
         $category->status = !$category->status;
         $category->save();
 
@@ -43,6 +47,9 @@ class CategoryController extends Controller
      */
     public function create():View
     {
+        if (!auth()->user()->can('create categories')) {
+            abort(403, 'Unauthorized');
+        }
 
         $categories = Category::all();
 
@@ -55,6 +62,9 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request):RedirectResponse
     {
+        if (!auth()->user()->can('store categories')) {
+            abort(403, 'Unauthorized');
+        }
         
         Category::create($request->validated());
         
@@ -66,6 +76,9 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
+        if (!auth()->user()->can('show categories')) {
+            abort(403, 'Unauthorized');
+        }
         //
         
         $category = Category::find($id);
@@ -84,6 +97,9 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        if (!auth()->user()->can('edit categories')) {
+            abort(403, 'Unauthorized');
+        }
         
         $categories = Category::all(); // Fetch all categories
         return view('categories.edit', compact('category', 'categories'));
@@ -94,6 +110,9 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category):RedirectResponse
     {
+        if (!auth()->user()->can('update categories')) {
+            abort(403, 'Unauthorized');
+        }
         //
         $category->update($request->validated());
         return redirect()->route('categories.index');
@@ -104,6 +123,9 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category):RedirectResponse
     {
+        if (!auth()->user()->can('delete categories')) {
+            abort(403, 'Unauthorized');
+        }
         //
         $category->delete();
         return redirect()->route('categories.index');

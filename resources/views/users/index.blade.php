@@ -16,7 +16,9 @@
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     {{ $user->name }}
                     <div>
+                        @can('edit users')
                         <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        @endcan
                         <!-- Include a delete form here if needed -->
                     </div>
                 </div>

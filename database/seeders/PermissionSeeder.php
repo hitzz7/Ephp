@@ -21,10 +21,44 @@ class PermissionSeeder extends Seeder
             'show products',
             'create products',
             'delete products',
+            'update products',
+
+            'list categories',
+            'edit categories',
+            'show categories',
+            'create categories',
+            'delete categories',
+            'update categories',
+            
+            // Sizes permissions
+            'list sizes',
+            'edit sizes',
+            'show sizes',
+            'create sizes',
+            'delete sizes',
+            'update sizes',
+            
+            // Colors permissions
+            'list colors',
+            'edit colors',
+            'show colors',
+            'create colors',
+            'delete colors',
+            'update colors',
+
+            'list users',
+            'edit users',
+            'update users',
+
+            'list roles',
+            'edit roles',
+            'update roles',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            if (!Permission::where('name', $permission)->exists()) {
+                Permission::create(['name' => $permission]);
+            }
         }
     }
 }
