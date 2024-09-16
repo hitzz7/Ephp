@@ -27,6 +27,12 @@
                     <x-nav-link :href="route('colors.index')" :active="request()->routeIs('dashboard')">
                         {{ __('Color') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('dashboard')">
+                        {{ __('Users') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('roles.index')" :active="request()->routeIs('dashboard')">
+                        {{ __('Roles') }}
+                    </x-nav-link>
                 </div>
             </div>
 

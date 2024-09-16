@@ -43,19 +43,17 @@
                         <div class="card mb-3">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $item->size->name }}</h5>
-                                <p class="card-text">Color: {{ $item->color->name }}</p>
+                                
                                 <p class="card-text">SKU: {{ $item->sku }}</p>
                                 <p class="card-text">Inventory: {{ $item->inventory }}</p>
-                                <p class="card-text">Weight: {{ $item->weight }}</p>
-                                <p class="card-text">Prices:</p>
+                                <p class="card-text">Prices: {{ $item->price }}</p>
+                                <p class="card-text">Color: {{ $item->color->name }}</p>
+                                <p class="card-text">Size: {{ $item->size->name }}</p>
+                                <p class="card-text">Status: {{ $item->status == 1 ? 'Active' : 'Inactive' }}</p>
+
+                                
                                 <ul class="list-group">
-                                    @foreach($item->prices as $price)
-                                        <li class="list-group-item">
-                                            Price: {{ $price->price }}
-                                            Quantity: {{ $price->quantity }}
-                                            Weight: {{ $price->weight }}
-                                        </li>
-                                    @endforeach
+                                    
                                 </ul>
                             </div>
                         </div>

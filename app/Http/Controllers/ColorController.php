@@ -14,6 +14,10 @@ class ColorController extends Controller
      */
     public function index(): View
     {
+        if (!auth()->user()->can('list colors')) {
+            abort(403, 'Unauthorized');
+        }
+
         $colors = Color::all();
 
         return view('colors.index', compact('colors'));
@@ -24,6 +28,9 @@ class ColorController extends Controller
      */
     public function create(): View
     {
+        if (!auth()->user()->can('create colors')) {
+            abort(403, 'Unauthorized');
+        }
         return view('colors.create');
     }
 
@@ -32,6 +39,9 @@ class ColorController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if (!auth()->user()->can('store colors')) {
+            abort(403, 'Unauthorized');
+        }
         // Validate and store the color
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:colors',
@@ -48,6 +58,9 @@ class ColorController extends Controller
      */
     public function show(Color $color): View
     {
+        if (!auth()->user()->can('show colors')) {
+            abort(403, 'Unauthorized');
+        }
         return view('colors.show', compact('color'));
     }
 
@@ -56,6 +69,9 @@ class ColorController extends Controller
      */
     public function edit(Color $color): View
     {
+        if (!auth()->user()->can('edit color')) {
+            abort(403, 'Unauthorized');
+        }
         return view('colors.edit', compact('color'));
     }
 
@@ -64,6 +80,9 @@ class ColorController extends Controller
      */
     public function update(Request $request, Color $color): RedirectResponse
     {
+        if (!auth()->user()->can('update colors')) {
+            abort(403, 'Unauthorized');
+        }
         // Validate and update the color
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:colors,name,' . $color->id,
@@ -80,6 +99,9 @@ class ColorController extends Controller
      */
     public function destroy(Color $color): RedirectResponse
     {
+        if (!auth()->user()->can('delete colors')) {
+            abort(403, 'Unauthorized');
+        }
         $color->delete();
 
         return redirect()->route('colors.index');

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('size_id')->constrained()->onDelete('cascade');
             $table->foreignId('color_id')->constrained()->onDelete('cascade');
             $table->integer('inventory');
-            $table->decimal('weight',10,2);
+            $table->decimal('price',10,2);
             $table->integer('status')->default(0);
             $table->string('sku')->index();
             

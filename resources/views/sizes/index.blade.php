@@ -17,12 +17,16 @@
                     
                     {{ $size->name }}
                     <div>
-                        <a href="{{ route('sizes.edit', $size->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        @can('edit sizes')
+                            <a href="{{ route('sizes.edit', $size->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        @endcan
+                        @can('delete sizes')
                         <form action="{{ route('sizes.destroy', $size->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                         </form>
+                        @endcan
                     </div>
                 </div>
             @empty

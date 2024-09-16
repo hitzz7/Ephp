@@ -12,6 +12,9 @@ class SizeController extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->can('list sizes')) {
+            abort(403, 'Unauthorized');
+        }
         $sizes = Size::all();
 
         return view('sizes.index', compact('sizes'));
@@ -22,6 +25,9 @@ class SizeController extends Controller
      */
     public function create()
     {
+        if (!auth()->user()->can('create sizes')) {
+            abort(403, 'Unauthorized');
+        }
         return view('sizes.create');
     }
 
@@ -30,6 +36,9 @@ class SizeController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->user()->can('store sizes')) {
+            abort(403, 'Unauthorized');
+        }
         $request->validate([
             'name' => 'required|unique:sizes|max:255',
         ]);
@@ -44,6 +53,9 @@ class SizeController extends Controller
      */
     public function show(Size $size)
     {
+        if (!auth()->user()->can('show sizes')) {
+            abort(403, 'Unauthorized');
+        }
         return view('sizes.show', compact('size'));
     }
 
@@ -52,6 +64,9 @@ class SizeController extends Controller
      */
     public function edit(Size $size)
     {
+        if (!auth()->user()->can('edit sizes')) {
+            abort(403, 'Unauthorized');
+        }
         return view('sizes.edit', compact('size'));
     }
 
@@ -60,6 +75,9 @@ class SizeController extends Controller
      */
     public function update(Request $request, Size $size)
     {
+        if (!auth()->user()->can('update sizes')) {
+            abort(403, 'Unauthorized');
+        }
         $request->validate([
             'name' => 'required|unique:sizes|max:255',
         ]);
@@ -74,6 +92,9 @@ class SizeController extends Controller
      */
     public function destroy(Size $size)
     {
+        if (!auth()->user()->can('delete sizes')) {
+            abort(403, 'Unauthorized');
+        }
         $size->delete();
 
         return redirect()->route('sizes.index');
